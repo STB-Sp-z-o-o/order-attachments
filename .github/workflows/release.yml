@@ -83,7 +83,7 @@ jobs:
         run: |
           git config --global user.email "github@actions.com"
           git config --global user.name "GitHub Actions"
-          git add .
+          git add order-attachments.php composer.json
           if [[ -n "$(git diff --cached)" ]]; then
             git commit -m "Bump version to ${{ env.new_version }} [skip ci]"
             git push
