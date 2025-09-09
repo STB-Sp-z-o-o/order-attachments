@@ -1,6 +1,6 @@
 {
   "name": "stb/order-attachments",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Bezpieczne załączniki do zamówień WooCommerce + REST API.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
