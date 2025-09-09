@@ -1,0 +1,106 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - README.md
+      - .gitignore
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repo
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      # Step 2: Extract current version and bump it
+      - name: Bump Plugin Version
+        id: bump_version
+        run: |
+          PLUGIN_FILE="order-attachments.php"
+          COMPOSER_FILE="composer.json"
+          
+          # Extract current version from plugin file
+          current_version=$(grep -Po 'Version: \K.*' "$PLUGIN_FILE")
+          echo "Current version: $current_version"
+
+          # Increment the patch version
+          IFS='.' read -r major minor patch <<< "$current_version"
+          new_version="$major.$minor.$((patch + 1))"
+          echo "New version: $new_version"
+
+          # Update the version in the plugin file
+          sed -i "s/Version: $current_version/Version: $new_version/" "$PLUGIN_FILE"
+          
+          # Update version in composer.json
+          sed -i "s/\"version\": \"$current_version\"/\"version\": \"$new_version\"/" "$COMPOSER_FILE"
+          
+          # If version doesn't exist in composer.json, add it after name
+          if ! grep -q '"version"' "$COMPOSER_FILE"; then
+            sed -i '/"name"/a\  "version": "'$new_version'",' "$COMPOSER_FILE"
+          fi
+          
+          echo "new_version=$new_version" >> $GITHUB_ENV
+
+      # Step 3: Install Composer dependencies
+      - name: Install Composer Dependencies
+        run: |
+          composer install --no-dev --optimize-autoloader
+
+      # Step 4: Create ZIP package
+      - name: Create ZIP Package
+        run: |
+          # Create a temporary directory for the plugin
+          mkdir -p temp-plugin/order-attachments
+          
+          # Copy all files except development files
+          rsync -av --progress . temp-plugin/order-attachments/ \
+            --exclude '.git*' \
+            --exclude '.github' \
+            --exclude 'temp-plugin' \
+            --exclude 'composer.lock' \
+            --exclude 'composer.json' \
+            --exclude '*.md' \
+            --exclude 'tests'
+          
+          # Create the zip file
+          cd temp-plugin
+          zip -r "../order-attachments-${{ env.new_version }}.zip" order-attachments/
+          cd ..
+          
+          # Clean up
+          rm -rf temp-plugin
+
+      # Step 5: Commit and push the changes
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.email "github@actions.com"
+          git config --global user.name "GitHub Actions"
+          git add .
+          if [[ -n "$(git diff --cached)" ]]; then
+            git commit -m "Bump version to ${{ env.new_version }} [skip ci]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
+
+      # Step 6: Create GitHub Release
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: v${{ env.new_version }}
+          tag_name: v${{ env.new_version }}
+          files: "order-attachments-${{ env.new_version }}.zip"
+          body: |
+            ### Changelog
+            - Bump version to ${{ env.new_version }}
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GH_TOKEN }}

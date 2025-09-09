@@ -1,0 +1,27 @@
+{
+  "name": "stb/order-attachments",
+  "version": "1.0.0",
+  "description": "Bezpieczne załączniki do zamówień WooCommerce + REST API.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    { "name": "Adrian Ciołek", "email": "adrian.ciolek@stb.tech" }
+  ],
+  "require": {
+    "php": ">=7.4",
+    "composer/installers": "^2.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "STB\\OrderAttachments\\": "src/"
+    }
+  },
+  "extra": {
+    "installer-name": "stb-order-attachments"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
+    }
+  }
+}
