@@ -3,7 +3,7 @@
  * Plugin Name: STB – Order Attachments (secure)
  * Description: Bezpieczne załączniki do zamówień WooCommerce + REST API + widok w panelu klienta i admina.
  * Author: Adrian Ciołek | STB Tech
- * Version: 1.0.1
+ * Version: 1.0.2
  * Requires Plugins: woocommerce
  * Requires PHP: 7.4
  * License: GPLv2 or later
