@@ -81,7 +81,11 @@ final class RestController
      */
     public static function canView(WP_REST_Request $req): bool
     {
-        return Repository::canUserAccessOrder(wc_get_order(absint($req['id'])));
+        $wc_order = wc_get_order(absint($req['id']));
+        if (!$wc_order) {
+            return false;
+        }
+        return Repository::canUserAccessOrder($wc_order);
     }
 
     /**
