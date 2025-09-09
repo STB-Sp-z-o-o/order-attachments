@@ -63,9 +63,10 @@ Content-Type: multipart/form-data
 **Przykład cURL:**
 ```bash
 curl -X POST \
-  'http://localhost:7003/wp-json/stb/v1/orders/2446/attachments?oauth_consumer_key=ck_xxx&oauth_nonce=xxx&oauth_signature=xxx&oauth_signature_method=HMAC-SHA256&oauth_timestamp=xxx' \
+  'https://localhost:7003/wp-json/stb/v1/orders/4393/attachments' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'file=@agent.cer'
+  -u 'ck_asdasd:cs_asdasd' \
+  -F 'file=@/ścieżka/do/pliku.pdf'
 ```
 
 
